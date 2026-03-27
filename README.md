@@ -2,7 +2,7 @@
 
 This extension enables CKAN to authenticate users via Keycloak using OpenID Connect (OIDC).
 
-This repository is a customized fork of:
+This repository is based on:
 
 - https://github.com/keitaroinc/ckanext-keycloak
 
@@ -28,7 +28,7 @@ Clone this repository into your CKAN source directory:
 
 ```bash
 cd /srv/app/src
-git clone https://github.com/sv-nagatani/ckanext-keycloak.git
+git clone https://github.com/NIED-DIR/ckanext-keycloak.git
 ```
 
 Install the extension:
