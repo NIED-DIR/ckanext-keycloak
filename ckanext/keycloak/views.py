@@ -115,6 +115,16 @@ def sso_login():
         context['user'] = g.user
         context['auth_user_obj'] = g.user_obj
 
+        # ここでCKANユーザー情報をKeycloakの最新情報で毎回上書き
+        update_dict = {
+            'id': g.user_obj.id,
+            'email': userinfo.get('email'),
+            'name': userinfo.get('preferred_username'),
+            'fullname': userinfo.get('name'),
+            # 必要に応じて他のフィールドも
+        }
+        tk.get_action('user_update')(context={'ignore_auth': True}, data_dict=update_dict)
+
         sync_keycloak_groups_and_roles_to_ckan(context, g.user_obj, userinfo)
 
         response = tk.redirect_to(tk.url_for('user.me', context))
