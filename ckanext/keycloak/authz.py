@@ -137,30 +137,50 @@ def _org_exists(ctx: Dict[str, Any], org_id: str) -> bool:
 
 def _ensure_org_member(ctx: Dict[str, Any], org_id: str, username: str, role: str) -> None:
     """
-    Ensure a user is a member of an organization with the given role.
-    We do delete->create to reliably update role.
-    Supports CKAN environments where organization_member_create expects either 'role' or 'capacity'.
+    Ensure that a user belongs to an organization with the specified role.
+
+    Role validation is delegated to CKAN's
+    organization_member_create action.
     """
-    # Delete may fail when user is not a member; ignore.
+    admin_ctx = _sysadmin_ctx(ctx)
+
     try:
-        tk.get_action("organization_member_delete")(ctx, {"id": org_id, "username": username})
+        tk.get_action("organization_member_create")(
+            admin_ctx,
+            {
+                "id": org_id,
+                "username": username,
+                "role": role,
+            },
+        )
+    except tk.ValidationError as exc:
+        log.error(
+            "Failed to synchronize organization membership: "
+            "org=%s user=%s role=%s errors=%s",
+            org_id,
+            username,
+            role,
+            exc.error_dict,
+        )
+        raise
+    except NotAuthorized:
+        log.exception(
+            "Not authorized to synchronize organization membership "
+            "even with sysadmin context: org=%s user=%s role=%s",
+            org_id,
+            username,
+            role,
+        )
+        raise
     except Exception:
-        pass
-
-    action = tk.get_action("organization_member_create")
-
-    # Try 'role' first (often used in newer stacks / customizations)
-    try:
-        action(ctx, {"id": org_id, "username": username, "role": role})
-        return
-    except tk.ValidationError as e:
-        log.warning("organization_member_create with role failed; retry with capacity. error=%s", e.error_dict)
-    except Exception as e:
-        log.warning("organization_member_create with role raised %s; retry with capacity", type(e).__name__)
-
-    # Fallback to 'capacity' (older semantics)
-    action(ctx, {"id": org_id, "username": username, "capacity": role})
-
+        log.exception(
+            "Unexpected error while synchronizing organization membership: "
+            "org=%s user=%s role=%s",
+            org_id,
+            username,
+            role,
+        )
+        raise
 
 def _delete_org_member(base_context: Dict[str, Any], org_id: str, username: str) -> bool:
     """
