@@ -15,23 +15,23 @@ log = logging.getLogger(__name__)
 
 BUTTON_STYLES = {
     'default': {
-        'label': '外部アカウントでログイン',
+        'label': '螟夜Κ繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ',
         'icon': None,
     },
     'google': {
-        'label': 'Googleでログイン',
+        'label': 'Google縺ｧ繝ｭ繧ｰ繧､繝ｳ',
         'icon': '/icons/keycloak/google.svg',
     },
     'microsoft': {
-        'label': 'Microsoftでログイン',
+        'label': 'Microsoft縺ｧ繝ｭ繧ｰ繧､繝ｳ',
         'icon': '/icons/keycloak/microsoft.svg',
     },
     'github': {
-        'label': 'GitHubでログイン',
+        'label': 'GitHub縺ｧ繝ｭ繧ｰ繧､繝ｳ',
         'icon': '/icons/keycloak/github.svg',
     },
     'gitlab': {
-        'label': 'GitLabでログイン',
+        'label': 'GitLab縺ｧ繝ｭ繧ｰ繧､繝ｳ',
         'icon': '/icons/keycloak/gitlab.svg',
     },
 }

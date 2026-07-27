@@ -29,7 +29,7 @@ def clear_button_configuration(monkeypatch):
 def test_default_button():
     assert helpers.keycloak_login_button() == {
         'style': 'default',
-        'label': '外部アカウントでログイン',
+        'label': '螟夜Κ繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ',
         'icon': None,
     }
 
@@ -37,14 +37,14 @@ def test_default_button():
 @pytest.mark.parametrize(
     ('style', 'label', 'icon'),
     [
-        ('google', 'Googleでログイン', '/icons/keycloak/google.svg'),
+        ('google', 'Google縺ｧ繝ｭ繧ｰ繧､繝ｳ', '/icons/keycloak/google.svg'),
         (
             'microsoft',
-            'Microsoftでログイン',
+            'Microsoft縺ｧ繝ｭ繧ｰ繧､繝ｳ',
             '/icons/keycloak/microsoft.svg',
         ),
-        ('github', 'GitHubでログイン', '/icons/keycloak/github.svg'),
-        ('gitlab', 'GitLabでログイン', '/icons/keycloak/gitlab.svg'),
+        ('github', 'GitHub縺ｧ繝ｭ繧ｰ繧､繝ｳ', '/icons/keycloak/github.svg'),
+        ('gitlab', 'GitLab縺ｧ繝ｭ繧ｰ繧､繝ｳ', '/icons/keycloak/gitlab.svg'),
     ],
 )
 def test_supported_button_styles(monkeypatch, style, label, icon):
@@ -82,7 +82,7 @@ def test_invalid_style_falls_back_to_default(monkeypatch, caplog):
         button = helpers.keycloak_login_button()
 
     assert button['style'] == 'default'
-    assert button['label'] == '外部アカウントでログイン'
+    assert button['label'] == '螟夜Κ繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ'
     assert 'Unsupported ckanext.keycloak.button_style' in caplog.text
 
 
@@ -90,12 +90,12 @@ def test_custom_button_label(monkeypatch):
     monkeypatch.setitem(
         tk.config,
         'ckanext.keycloak.button_label',
-        'SIP4Dアカウントでログイン',
+        'SIP4D繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ',
     )
 
     assert (
         helpers.keycloak_login_button()['label']
-        == 'SIP4Dアカウントでログイン'
+        == 'SIP4D繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ'
     )
 
 
@@ -108,7 +108,7 @@ def test_empty_custom_label_uses_default(monkeypatch):
 
     assert (
         helpers.keycloak_login_button()['label']
-        == '外部アカウントでログイン'
+        == '螟夜Κ繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ'
     )
 
 
