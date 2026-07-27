@@ -100,6 +100,57 @@ CKANEXT__KEYCLOAK__VERIFY_SSL=false
 - `true`: Verify SSL certificates. Recommended for production.
 - `false`: Disable verification for self-signed certificates or development environments.
 
+### 3. Login Button Appearance
+
+```ini
+ckanext.keycloak.button_style = default
+ckanext.keycloak.button_label =
+```
+
+Environment variables:
+
+```env
+CKANEXT__KEYCLOAK__BUTTON_STYLE=default
+CKANEXT__KEYCLOAK__BUTTON_LABEL=
+```
+
+Supported button styles:
+
+| Value | Default label |
+| --- | --- |
+| `default` | 外部アカウントでログイン |
+| `google` | Googleでログイン |
+| `microsoft` | Microsoftでログイン |
+| `github` | GitHubでログイン |
+| `gitlab` | GitLabでログイン |
+
+If `button_style` is omitted, empty, or invalid, `default` is used.
+
+`button_label` can override the standard label for any style:
+
+```ini
+ckanext.keycloak.button_style = default
+ckanext.keycloak.button_label = SIP4Dアカウントでログイン
+```
+
+### 4. Direct Identity Provider Redirect
+
+To redirect directly to a configured Keycloak identity provider, specify its
+Keycloak alias:
+
+```ini
+ckanext.keycloak.idp_hint = google
+```
+
+Environment variable:
+
+```env
+CKANEXT__KEYCLOAK__IDP_HINT=google
+```
+
+`button_style` controls only the button appearance. It does not select the
+Keycloak identity provider. `idp_hint` controls the authentication destination.
+
 ## Keycloak Configuration
 
 ### Client settings

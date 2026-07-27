@@ -1,0 +1,19 @@
+{% set button = h.keycloak_login_button() %}
+
+<a
+  class="btn btn-default keycloak-login-button keycloak-login-button--{{ button.style }}"
+  href="{{ h.url_for('keycloak.sso') }}"
+>
+  {% if button.icon %}
+    <img
+      class="keycloak-login-button__icon"
+      src="{{ h.url_for_static(button.icon) }}"
+      alt=""
+      aria-hidden="true"
+      width="18"
+      height="18"
+    >
+  {% endif %}
+
+  <span class="keycloak-login-button__label">{{ button.label }}</span>
+</a>

@@ -1,53 +1,155 @@
-"""
-Tests for plugin.py.
+import logging
 
-Tests are written using the pytest library (https://docs.pytest.org), and you
-should read the testing guidelines in the CKAN docs:
-https://docs.ckan.org/en/2.9/contributing/testing.html
+import pytest
 
-To write tests for your extension you should install the pytest-ckan package:
+from ckan.plugins import toolkit as tk
 
-    pip install pytest-ckan
-
-This will allow you to use CKAN specific fixtures on your tests.
-
-For instance, if your test involves database access you can use `clean_db` to
-reset the database:
-
-    import pytest
-
-    from ckan.tests import factories
-
-    @pytest.mark.usefixtures("clean_db")
-    def test_some_action():
-
-        dataset = factories.Dataset()
-
-        # ...
-
-For functional tests that involve requests to the application, you can use the
-`app` fixture:
-
-    from ckan.plugins import toolkit
-
-    def test_some_endpoint(app):
-
-        url = toolkit.url_for('myblueprint.some_endpoint')
-
-        response = app.get(url)
-
-        assert response.status_code == 200
+from ckanext.keycloak import helpers
 
 
-To temporary patch the CKAN configuration for the duration of a test you can use:
+@pytest.fixture(autouse=True)
+def clear_button_configuration(monkeypatch):
+    for environment_key in (
+        'CKANEXT__KEYCLOAK__BUTTON_STYLE',
+        'CKANEXT__KEYCLOAK__BUTTON_LABEL',
+        'CKANEXT__KEYCLOAK__IDP_HINT',
+    ):
+        monkeypatch.delenv(environment_key, raising=False)
 
-    import pytest
+    for config_key in (
+        'ckanext.keycloak.button_style',
+        'ckanext.keycloak.button_label',
+        'ckanext.keycloak.idp_hint',
+    ):
+        monkeypatch.delitem(tk.config, config_key, raising=False)
 
-    @pytest.mark.ckan_config("ckanext.myext.some_key", "some_value")
-    def test_some_action():
-        pass
-"""
-import ckanext.keycloak.plugin as plugin
+    helpers._warned_button_styles.clear()
 
-def test_plugin():
-    pass
+
+def test_default_button():
+    assert helpers.keycloak_login_button() == {
+        'style': 'default',
+        'label': '外部アカウントでログイン',
+        'icon': None,
+    }
+
+
+@pytest.mark.parametrize(
+    ('style', 'label', 'icon'),
+    [
+        ('google', 'Googleでログイン', '/icons/keycloak/google.svg'),
+        (
+            'microsoft',
+            'Microsoftでログイン',
+            '/icons/keycloak/microsoft.svg',
+        ),
+        ('github', 'GitHubでログイン', '/icons/keycloak/github.svg'),
+        ('gitlab', 'GitLabでログイン', '/icons/keycloak/gitlab.svg'),
+    ],
+)
+def test_supported_button_styles(monkeypatch, style, label, icon):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_style',
+        style,
+    )
+
+    button = helpers.keycloak_login_button()
+
+    assert button['style'] == style
+    assert button['label'] == label
+    assert button['icon'] == icon
+
+
+def test_button_style_is_normalized(monkeypatch):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_style',
+        '  MICROSOFT  ',
+    )
+
+    assert helpers.keycloak_login_button()['style'] == 'microsoft'
+
+
+def test_invalid_style_falls_back_to_default(monkeypatch, caplog):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_style',
+        'unknown-provider',
+    )
+
+    with caplog.at_level(logging.WARNING):
+        button = helpers.keycloak_login_button()
+
+    assert button['style'] == 'default'
+    assert button['label'] == '外部アカウントでログイン'
+    assert 'Unsupported ckanext.keycloak.button_style' in caplog.text
+
+
+def test_custom_button_label(monkeypatch):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_label',
+        'SIP4Dアカウントでログイン',
+    )
+
+    assert (
+        helpers.keycloak_login_button()['label']
+        == 'SIP4Dアカウントでログイン'
+    )
+
+
+def test_empty_custom_label_uses_default(monkeypatch):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_label',
+        '   ',
+    )
+
+    assert (
+        helpers.keycloak_login_button()['label']
+        == '外部アカウントでログイン'
+    )
+
+
+def test_environment_variable(monkeypatch):
+    monkeypatch.setenv(
+        'CKANEXT__KEYCLOAK__BUTTON_STYLE',
+        'github',
+    )
+
+    assert helpers.keycloak_login_button()['style'] == 'github'
+
+
+def test_ckan_config_takes_precedence_over_environment(monkeypatch):
+    monkeypatch.setenv(
+        'CKANEXT__KEYCLOAK__BUTTON_STYLE',
+        'github',
+    )
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.button_style',
+        'google',
+    )
+
+    assert helpers.keycloak_login_button()['style'] == 'google'
+
+
+def test_idp_hint(monkeypatch):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.idp_hint',
+        'google',
+    )
+
+    assert helpers.keycloak_idp_hint() == 'google'
+
+
+def test_empty_idp_hint(monkeypatch):
+    monkeypatch.setitem(
+        tk.config,
+        'ckanext.keycloak.idp_hint',
+        '   ',
+    )
+
+    assert helpers.keycloak_idp_hint() is None

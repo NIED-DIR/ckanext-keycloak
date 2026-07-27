@@ -1,5 +1,5 @@
-include README.rst
+include README.md
 include LICENSE
 include requirements.txt
-recursive-include ckanext/keycloak *.html *.json *.js *.less *.css *.mo *.yml
+recursive-include ckanext/keycloak *.html *.json *.js *.less *.css *.svg *.md *.mo *.yml
 recursive-include ckanext/keycloak/migration *.ini *.py *.mako

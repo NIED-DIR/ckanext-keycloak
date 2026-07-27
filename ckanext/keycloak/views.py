@@ -80,11 +80,13 @@ def login():
 
 def sso():
     log.info("SSO Login")
-    auth_url = None
     try:
-        auth_url = client.get_auth_url(redirect_uri=redirect_uri)
+        auth_url = client.get_auth_url(
+            redirect_uri=redirect_uri,
+            idp_hint=helpers.keycloak_idp_hint(),
+        )
     except Exception as e:
-        log.error("Error getting auth url: {}".format(e))
+        log.exception("Error getting Keycloak authentication URL")
         return tk.abort(500, "Error getting auth url: {}".format(e))
     return tk.redirect_to(auth_url)
 

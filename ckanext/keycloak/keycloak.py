@@ -1,6 +1,10 @@
 import logging
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
 from keycloak import KeycloakOpenID, KeycloakAdmin
+
 log = logging.getLogger(__name__)
+
 
 class KeycloakClient:
     def __init__(self, server_url, client_id, realm_name, client_secret_key, ssl_verify=True):
@@ -21,8 +25,21 @@ class KeycloakClient:
             , verify=self.ssl_verify
         )
 
-    def get_auth_url(self, redirect_uri):
-        return self.get_keycloak_client().auth_url(redirect_uri=redirect_uri, scope="openid profile email")
+    def get_auth_url(self, redirect_uri, idp_hint=None):
+        auth_url = self.get_keycloak_client().auth_url(
+            redirect_uri=redirect_uri,
+            scope="openid profile email",
+        )
+
+        if not idp_hint:
+            return auth_url
+
+        url_parts = list(urlsplit(auth_url))
+        query = parse_qsl(url_parts[3], keep_blank_values=True)
+        query.append(('kc_idp_hint', idp_hint))
+        url_parts[3] = urlencode(query)
+
+        return urlunsplit(url_parts)
 
     def get_token(self, code, redirect_uri):
         return self.get_keycloak_client().token(grant_type="authorization_code", code=code, redirect_uri=redirect_uri)
