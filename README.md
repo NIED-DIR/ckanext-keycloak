@@ -118,11 +118,11 @@ Supported button styles:
 
 | Value | Default label |
 | --- | --- |
-| `default` | 外部アカウントでログイン |
-| `google` | Googleでログイン |
-| `microsoft` | Microsoftでログイン |
-| `github` | GitHubでログイン |
-| `gitlab` | GitLabでログイン |
+| `default` | 螟夜Κ繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ |
+| `google` | Google縺ｧ繝ｭ繧ｰ繧､繝ｳ |
+| `microsoft` | Microsoft縺ｧ繝ｭ繧ｰ繧､繝ｳ |
+| `github` | GitHub縺ｧ繝ｭ繧ｰ繧､繝ｳ |
+| `gitlab` | GitLab縺ｧ繝ｭ繧ｰ繧､繝ｳ |
 
 If `button_style` is omitted, empty, or invalid, `default` is used.
 
@@ -130,7 +130,7 @@ If `button_style` is omitted, empty, or invalid, `default` is used.
 
 ```ini
 ckanext.keycloak.button_style = default
-ckanext.keycloak.button_label = SIP4Dアカウントでログイン
+ckanext.keycloak.button_label = SIP4D繧｢繧ｫ繧ｦ繝ｳ繝医〒繝ｭ繧ｰ繧､繝ｳ
 ```
 
 ### 4. Direct Identity Provider Redirect
